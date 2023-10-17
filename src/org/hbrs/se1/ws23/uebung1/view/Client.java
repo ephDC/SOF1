@@ -1,6 +1,8 @@
 package org.hbrs.se1.ws23.uebung1.view;
 
-public class Client {
+import org.hbrs.se1.ws23.uebung1.control.GermanTranslator;
+
+public class Client extends GermanTranslator {
 
 		/*
 		 * Methode zur Ausgabe einer Zahl auf der Console
@@ -16,6 +18,7 @@ public class Client {
 
 			System.out.println("Das Ergebnis der Berechnung: " +
 					"[das Ergebnis an dieser Stelle]"  );
+			translateNumber(aNumber);
 
 		 }
 }
