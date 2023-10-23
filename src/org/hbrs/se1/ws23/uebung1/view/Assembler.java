@@ -9,6 +9,5 @@ public class Assembler {
         Client client = new Client(translator);
         client.display(1);
 
-        //client.set
     }
 }
