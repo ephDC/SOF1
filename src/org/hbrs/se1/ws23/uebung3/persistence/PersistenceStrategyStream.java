@@ -1,5 +1,7 @@
 package org.hbrs.se1.ws23.uebung3.persistence;
+import org.hbrs.se1.ws23.uebung2.Member;
 
+import java.io.*;
 import java.util.List;
 
 public class PersistenceStrategyStream<E> implements PersistenceStrategy<E> {
@@ -13,14 +15,22 @@ public class PersistenceStrategyStream<E> implements PersistenceStrategy<E> {
         this.location = location;
     }
 
-    @Override
+    //@Override
     /**
      * Method for opening the connection to a stream (here: Input- and Output-Stream)
      * In case of having problems while opening the streams, leave the code in methods load
      * and save.
      */
-    public void openConnection() throws PersistenceException {
+    InputStream inputStream;
+    OutputStream outputStream;
 
+    public void openConnection() throws PersistenceException {
+        try{
+            inputStream = new FileInputStream("location.input.txt");
+        }
+        catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -28,7 +38,15 @@ public class PersistenceStrategyStream<E> implements PersistenceStrategy<E> {
      * Method for closing the connections to a stream
      */
     public void closeConnection() throws PersistenceException {
-
+        try{
+            outputStream = new FileOutputStream("location.input.txt");
+            outputStream.close();
+        }
+        catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -51,10 +69,41 @@ public class PersistenceStrategyStream<E> implements PersistenceStrategy<E> {
         // ObjectInputStream ois = null;
         // FileInputStream fis = null;
         // List<...> newListe =  null;
-        //
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
+        List<Member> newListe =  null;
         // Initiating the Stream (can also be moved to method openConnection()... ;-)
-        // fis = new FileInputStream( " a location to a file" );
+        // fis = new FileInputStream( " a location to a file" )
+        try {
+            inputStream = new FileInputStream("input.txt");
+            outputStream = new FileOutputStream("location.input.txt");
+            int i;
+            while ((i = inputStream.read()) != -1) {
+                assert outputStream != null;
+                outputStream.write(i);
+            }
 
+        }
+        catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        finally {
+            try {
+                // careful to close streams in finally
+                // block, but it’s not complete
+                if (inputStream != null)
+                    inputStream.close();
+                if (outputStream != null)
+                    outputStream.close();
+            }
+            catch (IOException | NullPointerException e){ {
+                System.out.println(
+                        "Error closing Stream");}
+            }
+        }
         // Tipp: Use a directory (ends with "/") to implement a negative test case ;-)
         // ois = new ObjectInputStream(fis);
 
@@ -66,6 +115,7 @@ public class PersistenceStrategyStream<E> implements PersistenceStrategy<E> {
         // return newListe
 
         // and finally close the streams (guess where this could be...?)
+
         return null;
     }
 }
