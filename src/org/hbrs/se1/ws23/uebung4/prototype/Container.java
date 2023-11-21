@@ -4,6 +4,8 @@ import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
+
 /*
  * Klasse zum Management sowie zur Eingabe unnd Ausgabe von User-Stories.
  * Die Anwendung wird über dies Klasse auch gestartet (main-Methode hier vorhanden)
@@ -70,7 +72,10 @@ public class Container {
 	public static void main (String[] args) throws Exception {
 		// ToDo: Bewertung Exception-Handling (F3, F7)
 		Container con = Container.getInstance();
-		con.startEingabe(); 
+		con.startEingabe();
+
+		UserStory u1 = new UserStory();
+		UserStory u2 = new UserStory();
 	}
 	
 	/*
@@ -83,6 +88,8 @@ public class Container {
 		
 		// Initialisierung des Eingabe-View
 		// ToDo: Funktionsweise des Scanners erklären (F3)
+		//User eingabe (von Typ String) von Tastatur einlesen und dann ist die Eingabe in
+		// ein Array gespeichert. Dann ach überprüfen ob Eingabe equals die Befehle
 		Scanner scanner = new Scanner( System.in );
 
 		while ( true ) {
@@ -98,7 +105,7 @@ public class Container {
 
 			// 	Falls 'help' eingegeben wurde, werden alle Befehle ausgedruckt
 			if ( strings[0].equals("help") ) {
-				System.out.println("Folgende Befehle stehen zur Verfuegung: help, dump....");
+				System.out.println("Folgende Befehle stehen zur Verfuegung: help, dump, enter, load, store, search, exit");
 			}
 			// Auswahl der bisher implementierten Befehle:
 			if ( strings[0].equals("dump") ) {
@@ -108,6 +115,18 @@ public class Container {
 			if ( strings[0].equals("enter") ) {
 				// Daten einlesen ...
 				// this.addUserStory( new UserStory( data ) ) um das Objekt in die Liste einzufügen.
+				System.out.println("Bitte Userstory Daten eingeben: (int id, String, titel, int mehrwert, int strafe," +
+						"int aufwand, int risk)");
+				Scanner sc = new Scanner(scanner.next());
+				int id = sc.nextInt();
+				String titel = sc.next();
+				int mehrwert = sc.nextInt();
+				int strafe = sc.nextInt();
+				int aufwand = sc.nextInt();
+				int risk = sc.nextInt();
+				double prio = (mehrwert + strafe) / (double) (aufwand + risk);
+				this.addUserStory(new UserStory(id, titel, mehrwert, strafe, aufwand, risk, prio));
+				break;
 			}
 								
 			if (  strings[0].equals("store")  ) {
@@ -116,6 +135,20 @@ public class Container {
 				userStory.setId(22);
 				this.addUserStory( userStory );
 				this.store();
+			}
+			if (  strings[0].equals("load")  ){
+				load();
+			}
+			if (  strings[0].equals("search")  ){
+				// Start searching
+				Scanner sc = new Scanner(scanner.next());
+				String suchwort = sc.next();
+				liste.stream()
+						.filter( p-> p.getProject().equals(suchwort) )
+						.collect( toList() );
+			}
+			if (  strings[0].equals("exit")  ){
+				break;
 			}
 		} // Ende der Schleife
 	}
@@ -131,6 +164,8 @@ public class Container {
 		// [Sortierung ausgelassen]
 		// Todo: Implementierung Sortierung (F4)
 
+		liste.sort(Comparator.comparing(UserStory::getId));
+
 		// Klassische Ausgabe ueber eine For-Each-Schleife
 		for (UserStory story : liste) {
 			System.out.println(story.toString());
@@ -141,6 +176,14 @@ public class Container {
 		// (Filterung Projekt = "ein Wert (z.B. Coll@HBRS)" und Risiko >=5
 		// Todo: Implementierung Filterung mit Lambda (F5)
 
+		Set<Integer> acceptableStories =
+				liste.stream()
+						.map(UserStory::getRisk)
+						.collect(Collectors.toSet());
+
+		liste.stream()
+				.filter(c -> acceptableStories.contains(c.getRisk() >= 5))
+				.collect(toList());
 	}
 
 	/*
